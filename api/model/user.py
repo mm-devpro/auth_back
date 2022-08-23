@@ -39,34 +39,3 @@ class UserModel(db.Model):
         if key == 'password':
             self.__dict__['password'] = generate_password_hash(value)
             return
-
-    def encode_auth_token(self, user_id):
-        """
-        Generates the Auth Token
-        :param user_id: id of current user to create token payload
-        :return: string
-        """
-        try:
-            payload = {
-                'sub': user_id,
-                'iat': datetime.utcnow(),
-                'exp': datetime.utcnow() + timedelta(days=30)
-            }
-            return jwt.encode(payload, SECRET_KEY, algorithm="HS256")
-        except Exception as e:
-            return e
-
-    @staticmethod
-    def decode_auth_token(auth_token):
-        """
-        Decodes the auth token
-        :param auth_token: sent by the client
-        :return: integer | string
-        """
-        try:
-            payload = jwt.decode(auth_token, SECRET_KEY, algorithms=["HS256"])
-            return payload['sub']
-        except jwt.ExpiredSignatureError:
-            return 'Signature expired. Please log in again.'
-        except jwt.InvalidTokenError:
-            return 'Invalid token. Please log in again.'
