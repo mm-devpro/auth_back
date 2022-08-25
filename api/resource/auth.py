@@ -1,49 +1,46 @@
-from datetime import timedelta
-from flask import jsonify, request
-from werkzeug.security import check_password_hash
-from flask_jwt_extended import create_access_token, get_jwt, get_jwt_identity, unset_jwt_cookies, jwt_required
+import os
+import logging
+import jwt
+from datetime import timedelta, datetime
+from flask import abort, jsonify, request, g, make_response
+from flask_restful import wraps, Resource
 
 from api.model.user import UserModel
+from api.service.auth import send_token_in_cookie
 
 
-def create_token(user):
-    additional_claims = {"username": user.username}
-    access_token = create_access_token(
-        identity=user.email,
-        expires_delta=timedelta(days=30),
-        additional_claims=additional_claims)
-    return jsonify(access_token=access_token)
+def set_token(user):
+    token = jwt.encode({"id": user.external_id, "exp": datetime.now() + timedelta(days=30)}, os.environ["SECRET_KEY"], algorithms=["HS256"])
+    send_token_in_cookie("user", token)
+    
+
+def require_login(func):
+    """
+    decorator function that checks if a user is logged from the id inside the cookie
+    :param func: decorated function
+    :return: set cookie "user" as empty if doesn't match any user id and send a 401, or go through the func
+    """
+    @wraps(func)
+    def wrapper(*args, **kwargs):
+        # check if "id" is in global cookie
+        if "id" not in g.cookie:
+            logging.warning("No authorization provided!")
+            abort(401)
+
+        # check in db if a user corresponds to the id
+        g.user = UserModel.query.get(g.cookie["id"])
+
+        # IF NOT, send a 401 and reset the cookie to empty
+        if not g.user:
+            response = make_response("", 401)
+            response.set_cookie("user", "")
+            return response
+
+        # IF YES, validate by returning the decorated func
+        return func(*args, **kwargs)
+    return wrapper
 
 
-def get_user():
-    ### 1) Check if user is in the db
-    try:
-        email = request.form.get("email")
-        user = UserModel.query.filter(UserModel.email == email).first()
-        if user is None:
-            return jsonify(
-                message="Pas d'utilisateur correspondant",
-                statusCode=401,
-                status="error"
-            )
+class AuthenticatedView(Resource):
+    method_decorators = [require_login]
 
-        ### 2) Check if password is good
-        password = request.form.get("password")
-        if check_password_hash(user.password, password) is False:
-            return jsonify(
-                message="Identifiants non valides, réessayez",
-                statusCode=401,
-                status="error"
-            )
-    except Exception as e:
-        return jsonify(
-            message=f"Erreur, reessayer plus tard ({e})",
-            statusCode=500,
-            status="error"
-        )
-    else:
-        return jsonify(
-            user=user,
-            status="success",
-            statusCode=200
-        )

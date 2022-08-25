@@ -3,8 +3,9 @@ import sys
 from flask import Flask
 from flask_cors import CORS
 from dotenv import load_dotenv
-from flask_jwt_extended import JWTManager
+
 from api.service.database import db, ma
+from api.service.auth import decode_cookie
 
 sys.path.append(path.dirname(path.dirname(path.abspath(__file__))))
 
@@ -24,7 +25,7 @@ def create_app():
     app.config['SECRET_KEY'] = SECRET_KEY
     app.config["JWT_SECRET_KEY"] = JWT_SECRET_KEY
     app.config['SQLALCHEMY_DATABASE_URI'] = f'mysql+pymysql://{DB_USER}:{DB_PWD}@{MYSQL_URL}:{MYSQL_PORT}/{MYSQL_DB}'
-    app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True
+    app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
     # initiate api from flask-restful, and add cors configuration
     # api = Api(app)
@@ -35,12 +36,14 @@ def create_app():
         db.init_app(app)
         ma.init_app(app)
 
-    jwt = JWTManager(app)
     # blueprint for auth routes in our app
     from api.route.auth import auth as auth_blueprint
     app.register_blueprint(auth_blueprint)
 
     # blueprint for non-auth parts of app
+
+    # decoding cookie before each request
+    app.before_request_funcs.setdefault(None, [decode_cookie])
 
     return app
 
