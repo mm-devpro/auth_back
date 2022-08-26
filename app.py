@@ -25,7 +25,7 @@ def create_app():
     app.config['SECRET_KEY'] = SECRET_KEY
     app.config["JWT_SECRET_KEY"] = JWT_SECRET_KEY
     app.config['SQLALCHEMY_DATABASE_URI'] = f'mysql+pymysql://{DB_USER}:{DB_PWD}@{MYSQL_URL}:{MYSQL_PORT}/{MYSQL_DB}'
-    app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+    app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True
 
     # initiate api from flask-restful, and add cors configuration
     # api = Api(app)
