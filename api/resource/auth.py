@@ -6,13 +6,24 @@ from flask import abort, jsonify, request, g, make_response
 from flask_restful import wraps, Resource
 
 from api.model.user import UserModel
-from api.service.auth import send_token_in_cookie
 
 
-def set_token(user):
-    token = jwt.encode({"id": user.external_id, "exp": datetime.now() + timedelta(days=30)}, os.environ["SECRET_KEY"], algorithms=["HS256"])
-    send_token_in_cookie("user", token)
-    
+def set_token_in_cookie(user):
+    """
+    method to set token with JWT and to send it to cookies
+    :param user: user credentials
+    :return: validation response
+    """
+    # encode the user info inside a jwt token
+    token = jwt.encode({"id": user.id, "exp": datetime.now() + timedelta(days=30)},
+                       os.environ["SECRET_KEY"],
+                       algorithm="HS256"
+                       )
+    # send the token to cookies
+    response = make_response("user logged with success", 200)
+    response.set_cookie("user", token)
+    return response
+
 
 def require_login(func):
     """

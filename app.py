@@ -1,4 +1,4 @@
-from os import getenv, path
+from os import environ, path
 import sys
 from flask import Flask
 from flask_cors import CORS
@@ -10,13 +10,14 @@ from api.service.auth import decode_cookie
 sys.path.append(path.dirname(path.dirname(path.abspath(__file__))))
 
 load_dotenv()
-DB_USER = getenv('DB_USER')
-DB_PWD = getenv('DB_PWD')
-SECRET_KEY = getenv('SECRET_KEY')
-MYSQL_URL = getenv('MYSQL_URL')
-MYSQL_DB = getenv('MYSQL_DB')
-MYSQL_PORT = getenv('MYSQL_PORT')
-JWT_SECRET_KEY = getenv('JWT_SECRET_KEY')
+DB_USER = environ['DB_USER']
+DB_PWD = environ['DB_PWD']
+SECRET_KEY = environ['SECRET_KEY']
+MYSQL_URL = environ['MYSQL_URL']
+MYSQL_DB = environ['MYSQL_DB']
+MYSQL_PORT = environ['MYSQL_PORT']
+JWT_SECRET_KEY = environ['JWT_SECRET_KEY']
+
 
 def create_app():
     # initiate app variable
@@ -41,6 +42,8 @@ def create_app():
     app.register_blueprint(auth_blueprint)
 
     # blueprint for non-auth parts of app
+    from api.route.home import home as home_blueprint
+    app.register_blueprint(home_blueprint)
 
     # decoding cookie before each request
     app.before_request_funcs.setdefault(None, [decode_cookie])

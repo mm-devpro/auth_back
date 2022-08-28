@@ -1,15 +1,16 @@
 from http import HTTPStatus
 from werkzeug.security import check_password_hash
-from flask import Blueprint, request
+from flask import Blueprint, request, make_response, g, jsonify
 from flasgger import swag_from
-from flask_jwt_extended import create_access_token, get_jwt, get_jwt_identity, unset_jwt_cookies, jwt_required
-
+from api.resource.auth import require_login
 
 home = Blueprint('home', __name__, url_prefix="/api/v1")
 
 
 @home.route('/')
-@jwt_required()
+@require_login
 def homepage():
-    pass
+    cook = g.cookie
+    cooki = request.cookies.get("user")
+    return make_response(jsonify(cook, cooki), 200)
 

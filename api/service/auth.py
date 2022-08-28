@@ -1,12 +1,14 @@
 import os
 import logging
 import jwt
-from datetime import timedelta
-from flask import abort, jsonify, request, g, make_response
-from werkzeug.security import check_password_hash
+from flask import abort, request, g
 
 
 def decode_cookie():
+    """
+    Function to decode cookie and set our api global "cookie" variable with
+    what is found in the cookie
+    """
     cookie = request.cookies.get("user")
 
     if not cookie:
@@ -18,9 +20,3 @@ def decode_cookie():
     except jwt.InvalidTokenError as err:
         logging.warning(str(err))
         abort(401)
-
-
-def send_token_in_cookie(token_name, token):
-    response = make_response(200, "")
-    response.set_cookie(token_name, token)
-    return response
