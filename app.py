@@ -44,6 +44,8 @@ def create_app():
     # blueprint for non-auth parts of app
     from api.route.home import home as home_blueprint
     app.register_blueprint(home_blueprint)
+    from api.route.camera import cam as cam_blueprint
+    app.register_blueprint(cam_blueprint)
 
     # decoding cookie before each request
     app.before_request_funcs.setdefault(None, [decode_cookie])
