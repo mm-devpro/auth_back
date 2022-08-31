@@ -1,16 +1,22 @@
 import cv2 as cv
 
 
-def gen_frames(cap):
+class Camera:
 
-    while True:
-        success, image = cap.read()
-        frame_gray = cv.cvtColor(image, cv.COLOR_BGR2GRAY)
-        frame_gray = cv.equalizeHist(frame_gray)
+    def __init__(self, camera_url):
+        self.url = int(camera_url)
 
-        ret, jpeg = cv.imencode('.jpg', image)
+    def gen_frames(self):
+        cap = cv.VideoCapture(self.url)
 
-        frame = jpeg.tobytes()
+        while True:
+            success, image = cap.read()
+            frame_gray = cv.cvtColor(image, cv.COLOR_BGR2GRAY)
+            frame_gray = cv.equalizeHist(frame_gray)
 
-        yield (b'--frame\r\n'
-               b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n\r\n')
+            ret, jpeg = cv.imencode('.jpg', image)
+
+            frame = jpeg.tobytes()
+
+            yield (b'--frame\r\n'
+                   b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n\r\n')
