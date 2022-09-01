@@ -5,7 +5,7 @@ import uuid
 from sqlalchemy.sql import func
 
 from api.service.database import db
-from api.service.variables import USER_ROLES, ADMIN_ROLES
+from api.service.variables import USER_ROLES, ADMIN_ROLES, USER_GROUP
 
 
 class UserModel(db.Model):
@@ -26,7 +26,13 @@ class UserModel(db.Model):
     _password = db.Column(db.String(500), nullable=False)
 
     username = db.Column(db.String(255), nullable=False)
+    name = db.Column(db.String(255), nullable=True)
+    surname = db.Column(db.String(255), nullable=True)
+    access = db.Column(db.Integer, server_default="0")
+    dob = db.Column(db.Date(), nullable=True)
+    group = db.Column(db.Enum(*USER_GROUP), server_default="invite")
     email = db.Column(db.String(100), unique=True)
+    img = db.Column(db.String(255), nullable=True)
     role = db.Column(db.Enum(*USER_ROLES, *ADMIN_ROLES), server_default="user")
     created_at = db.Column(db.DateTime(timezone=True), server_default=func.now())
     updated_at = db.Column(db.DateTime(timezone=True), onupdate=func.now())

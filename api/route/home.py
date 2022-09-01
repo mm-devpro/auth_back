@@ -8,10 +8,8 @@ home = Blueprint('home', __name__, url_prefix="/api/v1")
 
 
 @home.route('/')
-# @require_login
+@require_login
 def homepage():
-    # cook = g.cookie
-    # cooki = request.cookies.get("user")
-    # return make_response(jsonify(cook, cooki), 200)
-    return make_response(jsonify("coucou"), 200)
-
+    cook = g.cookie
+    ck = request.cookies.get("user")
+    return make_response(jsonify(cook, ck), 200)

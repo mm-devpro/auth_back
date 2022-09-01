@@ -15,12 +15,24 @@ def set_token_in_cookie(user):
     :return: validation response
     """
     # encode the user info inside a jwt token
-    token = jwt.encode({"id": user.id, "exp": datetime.now() + timedelta(days=30)},
+    u = {
+        "role": user.role,
+        "username": user.username,
+        "access": user.access,
+        "email": user.email,
+    }
+
+    token = jwt.encode({"id": user.id, "user": u, "exp": datetime.now() + timedelta(days=30)},
                        os.environ["SECRET_KEY"],
                        algorithm="HS256"
                        )
+
     # send the token to cookies
-    response = make_response("user logged with success", 200)
+    response = make_response(jsonify({
+        "status": "success",
+        "message": "user logged with success",
+        "user": u
+    }), 200)
     response.set_cookie("user", token)
     return response
 
