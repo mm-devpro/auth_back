@@ -9,7 +9,6 @@ class Camera:
     def gen_frames(self):
         global cap
         cap = cv.VideoCapture(self.url)
-        self.cap = cap
         
         while True:
             success, image = cap.read()
@@ -22,8 +21,4 @@ class Camera:
 
             yield (b'--frame\r\n'
                    b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n\r\n')
-
-    def stop_camera(self):
-        self.cap.release()
-        cv2.destroyAllWindows()
 
