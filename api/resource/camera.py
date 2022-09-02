@@ -7,8 +7,10 @@ class Camera:
         self.url = int(camera_url)
 
     def gen_frames(self):
+        global cap
         cap = cv.VideoCapture(self.url)
-
+        self.cap = cap
+        
         while True:
             success, image = cap.read()
             frame_gray = cv.cvtColor(image, cv.COLOR_BGR2GRAY)
@@ -20,3 +22,8 @@ class Camera:
 
             yield (b'--frame\r\n'
                    b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n\r\n')
+
+    def stop_camera(self):
+        self.cap.release()
+        cv2.destroyAllWindows()
+

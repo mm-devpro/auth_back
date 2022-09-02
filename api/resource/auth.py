@@ -16,10 +16,10 @@ def set_token_in_cookie(user):
     """
     # encode the user info inside a jwt token
     u = {
-        "role": user.role,
-        "username": user.username,
         "access": user.access,
         "email": user.email,
+        "role": user.role,
+        "username": user.username,
     }
 
     token = jwt.encode({"id": user.id, "user": u, "exp": datetime.now() + timedelta(days=30)},
@@ -41,7 +41,7 @@ def require_login(func):
     """
     decorator function that checks if a user is logged from the id inside the cookie
     :param func: decorated function
-    :return: set cookie "user" as empty if doesn't match any user id and send a 401, or go through the func
+    :return: set cookie "user" as empty if it doesn't match any user id and send a 401, or go through the func
     """
     @wraps(func)
     def wrapper(*args, **kwargs):

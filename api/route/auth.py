@@ -61,7 +61,8 @@ def login_with_email():
 def logout():
     # set cookie global to empty
     g.cookie = {}
-    response = make_response(200, "Logged out")
+    response = make_response("Logged out", 200)
+    response.set_cookie("user", "")
     return response
 
 
