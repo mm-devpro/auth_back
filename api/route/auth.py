@@ -1,5 +1,4 @@
 from http import HTTPStatus
-from werkzeug.security import check_password_hash
 import logging
 from flask import Blueprint, request, abort, make_response, jsonify, Response, g
 from flasgger import swag_from

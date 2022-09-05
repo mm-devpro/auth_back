@@ -22,7 +22,6 @@ class UserModel(db.Model):
     # if user sets up his account within the app
     _password = db.Column(db.String(500), nullable=False)
 
-    account_id = db.Column(db.Integer, db.ForeignKey("account.id"))
     username = db.Column(db.String(255), nullable=False)
     name = db.Column(db.String(255), nullable=True)
     surname = db.Column(db.String(255), nullable=True)
@@ -36,6 +35,12 @@ class UserModel(db.Model):
     created_at = db.Column(db.DateTime(timezone=True), server_default=func.now())
     updated_at = db.Column(db.DateTime(timezone=True), onupdate=func.now())
     last_login = db.Column(db.DateTime(timezone=True), nullable=True)
+
+    account_id = db.Column(db.Integer, db.ForeignKey("account.id"))
+    account = db.relationship('Account', back_populates='user')
+
+    def __repr__(self):
+        return f'<Account "{self.username}...">'
 
     @property
     def password(self):

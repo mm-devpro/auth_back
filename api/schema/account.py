@@ -1,5 +1,5 @@
 from api.service.database import ma
-from api.model.account_model import AccountModel
+from api.model.account import AccountModel
 
 
 class AccountSchema(ma.SQLAlchemyAutoSchema):

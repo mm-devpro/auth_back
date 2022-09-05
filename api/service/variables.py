@@ -28,3 +28,12 @@ LOCKER_TYPE = [
     "safe",
     "other"
 ]
+
+LOCKER_ACCESS = [
+    "0",
+    "1",
+    "2",
+    "3",
+    "4",
+    "5"
+]
