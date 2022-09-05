@@ -21,3 +21,10 @@ USER_GROUP = [
     "Friend",
     "Invite"
 ]
+
+LOCKER_TYPE = [
+    "door",
+    "gate",
+    "safe",
+    "other"
+]

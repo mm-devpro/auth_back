@@ -1,7 +1,4 @@
-from datetime import datetime, timedelta
 from werkzeug.security import generate_password_hash, check_password_hash
-import jwt
-import uuid
 from sqlalchemy.sql import func
 
 from api.service.database import db
@@ -25,9 +22,11 @@ class UserModel(db.Model):
     # if user sets up his account within the app
     _password = db.Column(db.String(500), nullable=False)
 
+    account_id = db.Column(db.Integer, db.ForeignKey("account.id"))
     username = db.Column(db.String(255), nullable=False)
     name = db.Column(db.String(255), nullable=True)
     surname = db.Column(db.String(255), nullable=True)
+    digit_pwd = db.Column(db.Integer, default=0000, server_default="0000")
     access = db.Column(db.Integer, server_default="0")
     dob = db.Column(db.Date(), nullable=True)
     group = db.Column(db.Enum(*USER_GROUP), server_default="invite")

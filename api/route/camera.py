@@ -1,9 +1,7 @@
 from flask import Blueprint, Response, g, abort
 from flasgger import swag_from
 from api.resource.auth import require_login
-import cv2 as cv
 from api.resource.camera import Camera
-from api.resource.webcam_stream import WebcamStream
 
 cam = Blueprint('camera', __name__, url_prefix="/api/v1")
 
