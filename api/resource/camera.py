@@ -1,24 +1,40 @@
-import cv2 as cv
+import cv2
+from threading import Thread, Lock
+from api.resource.base_camera import BaseCamera
 
 
-class Camera:
+class Camera (BaseCamera):
 
-    def __init__(self, camera_url):
-        self.url = int(camera_url)
+    def __init__(self, camera_src):
+        self.src = int(camera_src)
+        self.video = cv2.VideoCapture(self.src)
+        self.ret, self.frame = self.video.read()
 
-    def gen_frames(self):
-        global cap
-        cap = cv.VideoCapture(self.url)
-        
-        while True:
-            success, image = cap.read()
-            frame_gray = cv.cvtColor(image, cv.COLOR_BGR2GRAY)
-            frame_gray = cv.equalizeHist(frame_gray)
+    def __del__(self):
+        self.video.release()
 
-            ret, jpeg = cv.imencode('.jpg', image)
+    def get_frame(self):
+        global lock
+        lock = Lock()
 
-            frame = jpeg.tobytes()
+        # check if camera is opened
+        if self.video.isOpened():
+            self.ret, self.frame = self.video.read()
+        else:
+            self.ret = False
+
+        while self.ret:
+            with lock:
+                self.ret, self.frame = self.video.read()
+
+                if self.frame is None:
+                    continue
+
+                # encode the frame in JPEG format
+                ret, jpeg = cv2.imencode('.jpg', self.frame)
+                # ensure the frame was successfully encoded
+                if not ret:
+                    continue
 
             yield (b'--frame\r\n'
-                   b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n\r\n')
-
+                   b'Content-Type: image/jpeg\r\n\r\n' + jpeg.tobytes() + b'\r\n\r\n')
