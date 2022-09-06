@@ -4,8 +4,8 @@ from flask import Flask
 from flask_cors import CORS
 from dotenv import load_dotenv
 
-from api.service.database import db, ma
-from api.service.auth import decode_cookie
+from database import db, ma
+from service.auth import decode_cookie
 
 sys.path.append(path.dirname(path.dirname(path.abspath(__file__))))
 
@@ -38,13 +38,13 @@ def create_app():
         ma.init_app(app)
 
     # blueprint for auth routes in our app
-    from api.route.auth import auth as auth_blueprint
+    from route import auth as auth_blueprint
     app.register_blueprint(auth_blueprint)
 
     # blueprint for non-auth parts of app
-    from api.route.home import home as home_blueprint
+    from route import home as home_blueprint
     app.register_blueprint(home_blueprint)
-    from api.route.camera import cam as cam_blueprint
+    from route import cam as cam_blueprint
     app.register_blueprint(cam_blueprint)
 
     # decoding cookie before each request
